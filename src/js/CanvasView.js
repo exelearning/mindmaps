@@ -238,9 +238,14 @@ mindmaps.DefaultCanvasView = function() {
     });
 
     // mouse wheel listener
-    this.$getContainer().bind("mousewheel", function(e, delta) {
+    // Zoom is a vertical gesture, so ignore horizontal-only wheel movement.
+    this.$getContainer().bind("mousewheel", function(e, delta, deltaX, deltaY) {
+      if (!deltaY) {
+        return;
+      }
+
       if (self.mouseWheeled) {
-        self.mouseWheeled(delta);
+        self.mouseWheeled(deltaY);
       }
     });
   };
