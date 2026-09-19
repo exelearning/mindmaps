@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "jake": "12.10.1",
-    "uglify-js": "^3.3.27"
+    "uglify-js": "3.19.3"
   },
   "devDependencies": {
     "http-server": "14.1.1"
