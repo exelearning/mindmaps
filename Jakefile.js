@@ -14,7 +14,7 @@ var indexFile           = fs.readFileSync(srcDir + indexFileName, "utf8");
 function extractScriptNames() {
   console.log("Extracting script file names from index.html");
 
-  var regexScriptName = /<script src="(.*?)"><\/script\s*>/g;
+  var regexScriptName = /<script src="(.*?)"><\/script[^>]*>/g;
   var scriptSection = regexScriptSection.exec(indexFile)[1];
 
   // extract script names
