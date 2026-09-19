@@ -30,10 +30,36 @@
 var mindmaps = mindmaps || {};
 mindmaps.VERSION = "0.7.2";
 
+/*
+ * Translation hooks.
+ *
+ * A hosting application may install global translator functions before this
+ * bundle is loaded, in which case every user facing string below passes through
+ * them. Standalone mindmaps has no translator, so both default to the identity
+ * function and the original English strings are used unchanged.
+ *
+ *   _()   short interface strings
+ *   _r()  longer strings used by the help tutorial
+ *
+ * These are the only assumptions this application makes about its host, which
+ * is why they live here rather than being spread across the source tree.
+ */
+if (typeof window._ !== "function") {
+  window._ = function(string) {
+    return string;
+  };
+}
+if (typeof window._r !== "function") {
+  window._r = function(string) {
+    return string;
+  };
+}
+
 
 // experimental app cache invalidator. from:
 // http://www.html5rocks.com/en/tutorials/appcache/beginner/#toc-updating-cache/
 // Check if a new cache is available on page load.
+/* eXeLearning
 window.addEventListener('load', function(e) {
   window.applicationCache.addEventListener('updateready', function(e) {
     if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
@@ -49,13 +75,7 @@ window.addEventListener('load', function(e) {
   }, false);
 
 }, false)
-
-// manually redirect to mindmaps.app domain because app cache will keep serving the old index.html
-// even with the netlify redirects set up.
-if (window.location.hostname === 'drichard.org') {
-  window.onbeforeunload = null;
-  window.location.assign('https://www.mindmaps.app');
-}
+*/
 
 /**
  * Start up. This function is executed when the DOM is loaded.
@@ -104,7 +124,7 @@ function removeEventLayerXY() {
 */
 function addUnloadHook () {
   window.onbeforeunload = function (e) {
-    var msg = "Are you sure? Any unsaved progress will be lost."
+    var msg = _("If you have made changes and have not saved them, they will be lost. Do you really want to quit?")
     e = e || window.event;
 
     // For IE and Firefox prior to version 4
