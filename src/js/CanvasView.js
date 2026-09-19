@@ -830,9 +830,12 @@ mindmaps.DefaultCanvasView = function() {
 
       var metrics = textMetrics.getTextMetrics(self.node,
           view.zoomFactor, this.text);
-      $editor.attr({
-        value : this.text
-      }).css(metrics).appendTo(this.$text).select();
+      // .val(), not .attr("value"): a textarea has no value attribute, so setting
+      // one leaves the field empty. jQuery 1.6 quietly redirected .attr("value") to
+      // the property, which is why this worked there and stopped working later --
+      // the editor opened blank, the commit read "" and refused it as whitespace,
+      // and the editor could then never be closed or cancelled.
+      $editor.val(this.text).css(metrics).appendTo(this.$text).select();
 
     };
 
