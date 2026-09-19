@@ -81,7 +81,6 @@ window.addEventListener('load', function(e) {
  * Start up. This function is executed when the DOM is loaded.
  */
 $(function() {
-  removeEventLayerXY();
 
   // take car of old browsers
   createECMA5Shims();
@@ -98,26 +97,6 @@ $(function() {
   var appController = new mindmaps.ApplicationController();
   appController.go();
 });
-
-/**
- * Remove layerX and layerY from the jQuery event object, it causes heaps of deprecated
- * warnings in WebKit browsers.
- * See: http://stackoverflow.com/questions/7825448/webkit-issues-with-event-layerx-and-event-layery
- *
- * Can be removed when upgrading to jQuery 1.7+.
- */
-function removeEventLayerXY() {
-  // remove layerX and layerY
-  var all = $.event.props,
-  len = all.length,
-  res = [];
-
-  while (len--) {
-    var el = all[len];
-    if (el != 'layerX' && el != 'layerY') res.push(el);
-  }
-  $.event.props = res;
-}
 
 /**
 * Adds a confirmation dialog when the user navigates away from the app.

@@ -432,7 +432,7 @@ mindmaps.DefaultCanvasView = function() {
     }
 
     if (node.isRoot()) {
-      $node.children().andSelf().addClass("root");
+      $node.children().addBack().addClass("root");
     }
 
     // draw child nodes
