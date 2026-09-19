@@ -123,6 +123,22 @@ html,body {
   margin-right: 14px;
 }
 
+/*
+ * jQuery UI 1.12 introduced .ui-front for stacking, and the dialog widget relies
+ * on it: _moveToTop reads the z-index of its visible .ui-front siblings and raises
+ * itself above the highest. The Aristo theme predates that class, so those reads
+ * return "auto", the comparison is NaN, the dialog is never raised, and the modal
+ * overlay -- appended after it -- covers the dialog it is meant to sit behind.
+ * Every button inside a modal dialog then refuses to click.
+ *
+ * This is the one structural rule the theme is missing; the rest of jQuery UI's
+ * own stylesheet is deliberately not loaded, because it would restyle the whole
+ * application.
+ */
+.ui-front {
+  z-index: 100;
+}
+
 .buttons-right {
   position: absolute;
   right: 0;
