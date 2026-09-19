@@ -1,0 +1,106 @@
+# Continuous integration for the eXeLearning maintenance fork of mindmaps.
+#
+# This repository is a dependency of eXeLearning, which vendors the generated bundle
+# from a pinned commit and records its SHA-256. That contract only holds if the build
+# is reproducible, so CI checks three things: the tests pass, the build works on every
+# Node version we claim to support, and the same commit produces the same bytes --
+# twice on one machine, and identically across Node versions.
+#
+# Deliberately self-contained: nothing here depends on eXeLearning, so the fork stays
+# independently buildable and testable.
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 22 and 24 are the maintenance and active LTS lines; 26 is current. The
+        # engines field in package.json is only as honest as this list.
+        node: ['22', '24', '26']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      # npm ci, never npm install: install resolves uglify-js past the locked version
+      # and silently changes the minified output, which would break the vendor hash.
+      - name: Install pinned dependencies
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Record the bundle hash
+        id: first
+        run: |
+          hash=$(shasum -a 256 dist/js/script.js | cut -d' ' -f1)
+          echo "hash=$hash" >> "$GITHUB_OUTPUT"
+          echo "Bundle: $hash"
+
+      # A second build from a clean dist must land on the same bytes. A build that
+      # embeds a timestamp or iterates a hash map would diverge here.
+      - name: Build again and compare
+        run: |
+          rm -rf dist
+          npm run build
+          second=$(shasum -a 256 dist/js/script.js | cut -d' ' -f1)
+          first='${{ steps.first.outputs.hash }}'
+          echo "first:  $first"
+          echo "second: $second"
+          if [ "$first" != "$second" ]; then
+            echo "::error::Two builds of the same commit produced different bundles."
+            exit 1
+          fi
+
+      - name: Publish the hash for cross-version comparison
+        run: |
+          mkdir -p hashes
+          echo '${{ steps.first.outputs.hash }}' > "hashes/node-${{ matrix.node }}.sha256"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bundle-hash-node-${{ matrix.node }}
+          path: hashes/
+
+  reproducible:
+    name: Same bytes on every Node version
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: bundle-hash-node-*
+          merge-multiple: true
+          path: hashes
+
+      # eXeLearning pins one SHA-256 for the vendored bundle, so whoever regenerates it
+      # must get the same bytes whatever Node they happen to run.
+      - name: Compare
+        run: |
+          cat hashes/*.sha256
+          unique=$(sort -u hashes/*.sha256 | wc -l | tr -d ' ')
+          if [ "$unique" != "1" ]; then
+            echo "::error::Node versions disagree on the generated bundle."
+            exit 1
+          fi
+          echo "All Node versions agree: $(cat hashes/node-24.sha256)"
