@@ -1,6 +1,44 @@
 # PSA: This project is not actively maintained. I consider it feature complete for what it set out to do. I'll fix critical bugs should they pop up but I won't be adding new features.
 
 
+## eXeLearning maintenance fork
+
+This repository is a conservative maintenance fork of
+[drichard/mindmaps](https://github.com/drichard/mindmaps), maintained by the
+[eXeLearning](https://github.com/exelearning) project. The application, its
+architecture and its design are the work of David Richard and the original
+contributors; this fork claims no authorship over them.
+
+As stated above, the original author considers mindmaps feature-complete and
+intentionally does not pursue modernization. eXeLearning embeds mindmaps in its
+editor, so we keep this fork as a place to carry out the maintenance our own
+distribution requires: dependency updates, findings reported by security
+tooling, browser compatibility, and fixes needed for its continued use inside
+eXeLearning.
+
+Our intention is to preserve the existing HTML/JavaScript architecture,
+behaviour and simplicity. This is explicitly **not** a rewrite in React, Vue,
+Angular or TypeScript, nor a migration to Vite or another toolchain for the sake
+of modernization. The absence of a build pipeline is a feature of this codebase,
+and we intend to keep it.
+
+We aim to keep the divergence from upstream as small as reasonably possible.
+Changes that are generic and potentially useful to mindmaps itself are kept
+small and self-contained, so that they can also be offered upstream as
+independent pull requests when appropriate.
+
+### Branches
+
+* `master` tracks [drichard/mindmaps](https://github.com/drichard/mindmaps)
+  and only ever moves by fast-forward synchronization. No eXeLearning-specific
+  commit is made on it.
+* `main` is the eXeLearning maintenance branch. All maintenance work is
+  developed in feature branches and merged into `main` through pull requests.
+
+Background and context for this decision:
+[drichard/mindmaps#107](https://github.com/drichard/mindmaps/issues/107).
+
+
 # mindmaps
 mindmaps is a HTML5 based mind mapping application. It lets you create neat looking mind maps in the browser.
 
