@@ -96,7 +96,7 @@ mindmaps.StatusNotificationController = function(eventBus, view) {
     var n = new mindmaps.Notification($anchor, {
       position : "topRight",
       expires : 3500,
-      content : "Mind map saved"
+      content : _("Mind map saved")
     });
   });
   
@@ -112,7 +112,7 @@ mindmaps.StatusNotificationController = function(eventBus, view) {
   eventBus.subscribe(mindmaps.Event.NOTIFICATION_WARN, function(message) {
     var n = new mindmaps.Notification($anchor, {
       position : "topRight",
-      title: "Warning",
+      title: _("Warning"),
       content : message,
       expires : 4000,
       type: "warn"
@@ -123,7 +123,7 @@ mindmaps.StatusNotificationController = function(eventBus, view) {
   eventBus.subscribe(mindmaps.Event.NOTIFICATION_ERROR, function(message) {
     var n = new mindmaps.Notification($anchor, {
       position : "topRight",
-      title: "Error",
+      title: _("Error"),
       content : message,
       expires : 4500,
       type: "error"
