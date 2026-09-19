@@ -101,6 +101,28 @@ html,body {
   margin-right: 14px;
 }
 
+/*
+ * jQuery UI 1.12 replaced the buttonset widget with controlgroup, and a
+ * controlgroup is a block element that takes the full width of its parent. The
+ * button groups have always sat side by side on one row here, so they are put
+ * back inline; without this each group claims its own line, the toolbar grows,
+ * and its right-hand buttons drop underneath it.
+ *
+ * Two classes on purpose: controlgroup also carries ui-helper-clearfix, and the
+ * Aristo theme loads after this file and sets that to display:block. A
+ * single-class rule here would lose on source order.
+ */
+.ui-controlgroup.ui-helper-clearfix,
+.ui-controlgroup.ui-controlgroup-horizontal {
+  display: inline-block;
+  width: auto;
+  vertical-align: middle;
+}
+
+#toolbar .ui-controlgroup {
+  margin-right: 14px;
+}
+
 .buttons-right {
   position: absolute;
   right: 0;
