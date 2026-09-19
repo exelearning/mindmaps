@@ -110,7 +110,22 @@ test("status bar notifications and the console alert are translated", function()
   assert.ok(/window\.alert\(_\("Error"\)/.test(read("MindMaps.js")), "MindMaps.js console alert");
 });
 
-// 7. The hooks have to survive minification, which is what actually ships.
+// 7. The vendored plugins the application binds to must stay present and usable.
+test("vendored jquery plugins expose the APIs the application binds", function() {
+  var libs = path.join(srcDir, "libs");
+  var mousewheel = fs.readFileSync(path.join(libs, "jquery.mousewheel.js"), "utf8");
+
+  // mindmaps binds $(el).bind("mousewheel", function(event, delta) {...}) and reads only
+  // the sign of delta, so the special event and the delta argument are the whole contract.
+  assert.ok(/jQuery Mousewheel 3\.1\.13/.test(mousewheel), "mousewheel is the pinned 3.1.13");
+  assert.ok(/\$\.event\.special\.mousewheel/.test(mousewheel), "registers the special event");
+  assert.ok(/args\.unshift\(event, delta/.test(mousewheel), "still passes delta as the first extra argument");
+
+  assert.ok(/\.bind\("mousewheel"/.test(read("CanvasView.js")), "CanvasView still binds mousewheel");
+  assert.ok(/delta > 0/.test(read("CanvasPresenter.js")), "zoom still keys off the sign of delta");
+});
+
+// 8. The hooks have to survive minification, which is what actually ships.
 test("the built bundle keeps the hooks and the fallback", function() {
   if (!fs.existsSync(distBundle)) {
     console.log("  (skipped: run `npm run build` first)");
