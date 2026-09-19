@@ -14,7 +14,7 @@ var indexFile           = fs.readFileSync(srcDir + indexFileName, "utf8");
 function extractScriptNames() {
   console.log("Extracting script file names from index.html");
 
-  var regexScriptName = /<script src="(.*?)"><\/script>/g;
+  var regexScriptName = /<script src="(.*?)"><\/script\s*>/g;
   var scriptSection = regexScriptSection.exec(indexFile)[1];
 
   // extract script names
@@ -107,7 +107,9 @@ task("build", function() {
     // convert wildcard notation to proper regex
     // *foo.jpg becomes ^.*foo\.jpg$
     excludeFiles = excludeFiles.map(function(file) {
-      file = file.replace(/\./g, "\\.").replace("*", ".*", "g");
+      // * is deliberately left out of the escaped set: it is the wildcard,
+      // turned into .* on the next call.
+      file = file.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*");
       file = "^" + file + "$";
       return file;
     });
