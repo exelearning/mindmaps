@@ -243,10 +243,11 @@ mindmaps.DefaultCanvasView = function() {
     // horizontal delta when the vertical one is zero, so a sideways two-finger
     // swipe used to zoom the map. Zoom is a vertical gesture, and a horizontal
     // one should leave it alone.
-    this.$getContainer().bind("mousewheel", function(e, delta, deltaX, deltaY) {
-      // Older builds of the plugin pass no deltaY; fall back to the generic
-      // delta there so this keeps working rather than silently doing nothing.
-      var vertical = typeof deltaY === "number" ? deltaY : delta;
+    this.$getContainer().bind("mousewheel", function(e) {
+      // e.deltaY rather than the extra callback arguments: the plugin sets the
+      // normalised deltas on the event itself, and that is the part of its API
+      // that is not deprecated.
+      var vertical = e.deltaY;
       if (!vertical) {
         return;
       }
