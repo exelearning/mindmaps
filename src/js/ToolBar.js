@@ -32,7 +32,7 @@ mindmaps.ToolBarView = function() {
       // var $button = self.createButton(button);
       $buttonset.append(button.asJquery());
     });
-    $buttonset.buttonset();
+    $buttonset.controlgroup();
     alignFunc($buttonset);
   };
 

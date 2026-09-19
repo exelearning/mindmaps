@@ -18,9 +18,13 @@ mindmaps.InspectorView = function() {
   var $branchColorChildrenButton = $("#inspector-button-branch-color-children", $content);
   var branchColorPicker = $("#inspector-branch-color-picker", $content);
   var fontColorPicker = $("#inspector-font-color-picker", $content);
+  // Buttons and checkboxes are separate jQuery UI widgets -- button and
+  // checkboxradio -- so they are kept apart rather than addressed through one
+  // widget method that only half of them implement.
   var $allButtons = [ $sizeDecreaseButton, $sizeIncreaseButton,
-      $boldCheckbox, $italicCheckbox, $underlineCheckbox,
-      $linethroughCheckbox, $branchColorChildrenButton ];
+      $branchColorChildrenButton ];
+  var $allCheckboxes = [ $boldCheckbox, $italicCheckbox, $underlineCheckbox,
+      $linethroughCheckbox ];
   var $allColorpickers = [ branchColorPicker, fontColorPicker ];
 
   /**
@@ -43,6 +47,10 @@ mindmaps.InspectorView = function() {
       $button.button(state);
     });
 
+    $allCheckboxes.forEach(function($checkbox) {
+      $checkbox.checkboxradio(state);
+    });
+
     $allColorpickers.forEach(function($colorpicker) {
       $colorpicker.miniColors("disabled", !enabled);
     });
@@ -54,7 +62,7 @@ mindmaps.InspectorView = function() {
    * @param {Boolean} checked
    */
   this.setBoldCheckboxState = function(checked) {
-    $boldCheckbox.prop("checked", checked).button("refresh");
+    $boldCheckbox.prop("checked", checked).checkboxradio("refresh");
   };
 
   /**
@@ -63,7 +71,7 @@ mindmaps.InspectorView = function() {
    * @param {Boolean} checked
    */
   this.setItalicCheckboxState = function(checked) {
-    $italicCheckbox.prop("checked", checked).button("refresh");
+    $italicCheckbox.prop("checked", checked).checkboxradio("refresh");
   };
 
   /**
@@ -72,7 +80,7 @@ mindmaps.InspectorView = function() {
    * @param {Boolean} checked
    */
   this.setUnderlineCheckboxState = function(checked) {
-    $underlineCheckbox.prop("checked", checked).button("refresh");
+    $underlineCheckbox.prop("checked", checked).checkboxradio("refresh");
   };
 
   /**
@@ -81,7 +89,7 @@ mindmaps.InspectorView = function() {
    * @param {Boolean} checked
    */
   this.setLinethroughCheckboxState = function(checked) {
-    $linethroughCheckbox.prop("checked", checked).button("refresh");
+    $linethroughCheckbox.prop("checked", checked).checkboxradio("refresh");
   };
 
   /**
@@ -106,7 +114,7 @@ mindmaps.InspectorView = function() {
    * Initialise
    */
   this.init = function() {
-    $(".buttonset", $content).buttonset();
+    $(".buttonset", $content).controlgroup();
     $branchColorChildrenButton.button();
 
     $sizeDecreaseButton.click(function() {

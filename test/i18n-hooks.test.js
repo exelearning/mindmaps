@@ -125,7 +125,70 @@ test("vendored jquery plugins expose the APIs the application binds", function()
   assert.ok(/delta > 0/.test(read("CanvasPresenter.js")), "zoom still keys off the sign of delta");
 });
 
-// 8. The hooks have to survive minification, which is what actually ships.
+// 8. The build contract: what ships inside the bundle and what the host provides.
+test("host-provided dependencies stay out of the bundle", function() {
+  if (!fs.existsSync(distBundle)) {
+    console.log("  (skipped: run `npm run build` first)");
+    return;
+  }
+  var bundle = fs.readFileSync(distBundle, "utf8");
+
+  // jQuery, jQuery UI and FileSaver are loaded by the page, not concatenated into it.
+  // An application embedding mindmaps supplies its own, and shipping a second copy
+  // inside the bundle would mean two jQuery UIs fighting over the same widgets.
+  assert.ok(!/jQuery JavaScript Library/.test(bundle), "jQuery is not bundled");
+  assert.ok(!/jQuery UI \d/.test(bundle), "jQuery UI is not bundled");
+  assert.ok(!/FileSaver\.js/.test(bundle), "FileSaver is not bundled");
+
+  // The mindmaps-owned plugins are bundled, because nothing else provides them.
+  assert.ok(/jQuery Mousewheel/.test(bundle), "mousewheel is bundled");
+  assert.ok(/dragscrollable/i.test(bundle), "dragscrollable is bundled");
+  assert.ok(/miniColors/i.test(bundle), "minicolors is bundled");
+});
+
+test("the page loads its dependencies from disk, never from a CDN", function() {
+  var html = fs.readFileSync(path.join(__dirname, "..", "src", "index.html"), "utf8");
+  var sources = [];
+  var pattern = /<script[^>]+src="([^"]+)"/gi;
+  var match;
+  while ((match = pattern.exec(html)) !== null) sources.push(match[1]);
+
+  assert.ok(sources.length > 0, "index.html loads scripts");
+  sources.forEach(function(src) {
+    assert.ok(!/^\/\//.test(src), src + " is protocol-relative");
+    assert.ok(!/^https?:/i.test(src), src + " is remote");
+  });
+  // The cloud integration used to pull an unversioned third-party loader.
+  // The cloud integration pulled an unversioned third-party loader that could not be
+  // pinned, vendored or licensed for redistribution; its UI is gone with it. An ordinary
+  // hyperlink a user can click is not a dependency, so only loader URLs are checked.
+  assert.ok(!/api\.filestackapi\.com|filepicker\.io\/v\d|<script[^>]+filestack/i.test(html), "no Filestack loader");
+});
+
+test("the vendored host dependencies are the expected versions", function() {
+  var vendor = path.join(__dirname, "..", "src", "js", "vendor");
+  var jquery = fs.readFileSync(path.join(vendor, "jquery.min.js"), "utf8");
+  var jqueryUi = fs.readFileSync(path.join(vendor, "jquery-ui.min.js"), "utf8");
+
+  // Matching what eXeLearning ships, so the fork is developed against the same code
+  // that runs it in production rather than against a version nobody uses any more.
+  assert.ok(/jQuery v3\.7\.1/.test(jquery), "jQuery 3.7.1");
+  assert.ok(/jQuery UI - v1\.14\.1/.test(jqueryUi), "jQuery UI 1.14.1");
+});
+
+test("no jQuery API removed in 3.x survives in application source", function() {
+  var dir = fs.readdirSync(srcDir).filter(function(f) { return f.endsWith(".js"); });
+  var removed = ["andSelf(", "$.browser", "$.event.props", ".live(", "jQuery.boxModel"];
+
+  dir.forEach(function(file) {
+    var source = fs.readFileSync(path.join(srcDir, file), "utf8");
+    removed.forEach(function(api) {
+      assert.ok(source.indexOf(api) === -1, file + " still uses " + api);
+    });
+  });
+});
+
+// 9. The hooks have to survive minification, which is what actually ships.
 test("the built bundle keeps the hooks and the fallback", function() {
   if (!fs.existsSync(distBundle)) {
     console.log("  (skipped: run `npm run build` first)");
