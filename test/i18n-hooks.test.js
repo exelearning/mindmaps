@@ -146,7 +146,7 @@ test("host-provided dependencies stay out of the bundle", function() {
   // The mindmaps-owned plugins are bundled, because nothing else provides them.
   assert.ok(/jQuery Mousewheel/.test(bundle), "mousewheel is bundled");
   assert.ok(/dragscrollable/i.test(bundle), "dragscrollable is bundled");
-  assert.ok(/miniColors/i.test(bundle), "minicolors is bundled");
+  assert.ok(/minicolors/i.test(bundle), "minicolors is bundled");
 });
 
 test("the page loads its dependencies from disk, never from a CDN", function() {
@@ -166,6 +166,22 @@ test("the page loads its dependencies from disk, never from a CDN", function() {
   // pinned, vendored or licensed for redistribution; its UI is gone with it. An ordinary
   // hyperlink a user can click is not a dependency, so only loader URLs are checked.
   assert.ok(!/api\.filestackapi\.com|filepicker\.io\/v\d|<script[^>]+filestack/i.test(html), "no Filestack loader");
+});
+
+test("the colour picker is the maintained MiniColors release", function() {
+  var minicolors = fs.readFileSync(path.join(srcDir, "libs", "jquery.minicolors.js"), "utf8");
+
+  // @claviska/jquery-minicolors, not the unscoped package, which is stale and not the
+  // author's. 2.x renamed the plugin and its callbacks, so the call sites moved with it.
+  assert.ok(/jQuery MiniColors: A tiny color picker built on jQuery/.test(minicolors), "is MiniColors");
+  assert.ok(/MiniColors 2\.3\.6/.test(minicolors), "pinned to 2.3.6");
+  assert.ok(/minicolors:\s*function/.test(minicolors), "registers the lowercase plugin method");
+
+  var inspector = read("Inspector.js");
+  assert.ok(!/\.miniColors\(/.test(inspector), "no call site left on the 1.5 name");
+  assert.ok(/\.minicolors\(/.test(inspector), "call sites use the 2.x name");
+  assert.ok(/change\s*:/.test(inspector), "live preview uses the change callback");
+  assert.ok(!/move\s*:/.test(inspector), "the removed move callback is gone");
 });
 
 test("the vendored host dependencies are the expected versions", function() {

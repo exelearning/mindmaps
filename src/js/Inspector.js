@@ -52,7 +52,9 @@ mindmaps.InspectorView = function() {
     });
 
     $allColorpickers.forEach(function($colorpicker) {
-      $colorpicker.miniColors("disabled", !enabled);
+      // MiniColors 2 has no "disabled" method: it checks the input's own disabled
+      // property before opening, so setting that is the supported way.
+      $colorpicker.prop("disabled", !enabled);
     });
   };
 
@@ -98,7 +100,7 @@ mindmaps.InspectorView = function() {
    * @param {String} color
    */
   this.setBranchColorPickerColor = function(color) {
-    branchColorPicker.miniColors("value", color);
+    branchColorPicker.minicolors("value", color);
   };
 
   /**
@@ -107,7 +109,7 @@ mindmaps.InspectorView = function() {
    * @param {String} color
    */
   this.setFontColorPickerColor = function(color) {
-    fontColorPicker.miniColors("value", color);
+    fontColorPicker.minicolors("value", color);
   };
 
   /**
@@ -157,39 +159,50 @@ mindmaps.InspectorView = function() {
       }
     });
 
-    branchColorPicker.miniColors({
-      hide : function(hex) {
+    // MiniColors 2 renamed "move" to "change" and drops the hex argument from
+    // "hide", where `this` is now the input element rather than a jQuery object.
+    branchColorPicker.minicolors({
+      // Right-aligned so the panel stays inside the inspector. Left-aligned it
+      // spills past the panel edge and the canvas paints over the colour grid.
+      position : 'bottom right',
+
+      hide : function() {
+        var $input = $(this);
         // dont emit event if picker was hidden due to disable
-        if (this.attr('disabled')) {
+        if ($input.prop('disabled')) {
           return;
         }
 
-        console.log("hide branch", hex);
         if (self.branchColorPicked) {
-          self.branchColorPicked(hex);
+          self.branchColorPicked($input.val());
         }
       },
 
-      move : function(hex) {
+      change : function(hex) {
         if (self.branchColorPreview) {
           self.branchColorPreview(hex);
         }
       }
     });
 
-    fontColorPicker.miniColors({
-      hide : function(hex) {
+    fontColorPicker.minicolors({
+      // Right-aligned so the panel stays inside the inspector. Left-aligned it
+      // spills past the panel edge and the canvas paints over the colour grid.
+      position : 'bottom right',
+
+      hide : function() {
+        var $input = $(this);
         // dont emit event if picker was hidden due to disable
-        if (this.attr('disabled')) {
+        if ($input.prop('disabled')) {
           return;
         }
-        console.log("font", hex);
+
         if (self.fontColorPicked) {
-          self.fontColorPicked(hex);
+          self.fontColorPicked($input.val());
         }
       },
 
-      move: function(hex) {
+      change: function(hex) {
         if (self.fontColorPreview) {
           self.fontColorPreview(hex);
         }
