@@ -29,7 +29,7 @@
     "node": ">=22"
   },
   "dependencies": {
-    "jake": "^8.0.15",
+    "jake": "12.10.1",
     "uglify-js": "^3.3.27"
   },
   "devDependencies": {
