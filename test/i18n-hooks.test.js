@@ -115,14 +115,17 @@ test("vendored jquery plugins expose the APIs the application binds", function()
   var libs = path.join(srcDir, "libs");
   var mousewheel = fs.readFileSync(path.join(libs, "jquery.mousewheel.js"), "utf8");
 
-  // mindmaps binds $(el).bind("mousewheel", function(event, delta) {...}) and reads only
-  // the sign of delta, so the special event and the delta argument are the whole contract.
-  assert.ok(/jQuery Mousewheel 3\.1\.13/.test(mousewheel), "mousewheel is the pinned 3.1.13");
+  // mindmaps binds the special mousewheel event and reads event.deltaY, zooming on its
+  // sign. The normalised deltas on the event object are the part of the plugin's API that
+  // is not deprecated, so that is what the contract pins.
+  assert.ok(/jQuery Mousewheel 3\.2\.2/.test(mousewheel), "mousewheel is the pinned 3.2.2");
   assert.ok(/\$\.event\.special\.mousewheel/.test(mousewheel), "registers the special event");
-  assert.ok(/args\.unshift\(event, delta/.test(mousewheel), "still passes delta as the first extra argument");
+  assert.ok(/event\.deltaY\s*=/.test(mousewheel), "sets the normalised deltaY on the event");
+  assert.ok(/event\.deltaX\s*=/.test(mousewheel), "sets the normalised deltaX on the event");
 
   assert.ok(/\.bind\("mousewheel"/.test(read("CanvasView.js")), "CanvasView still binds mousewheel");
-  assert.ok(/delta > 0/.test(read("CanvasPresenter.js")), "zoom still keys off the sign of delta");
+  assert.ok(/e\.deltaY/.test(read("CanvasView.js")), "the zoom reads the vertical delta");
+  assert.ok(/delta > 0/.test(read("CanvasPresenter.js")), "zoom still keys off the sign");
 });
 
 // 8. The build contract: what ships inside the bundle and what the host provides.
