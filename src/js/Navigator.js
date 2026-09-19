@@ -99,10 +99,8 @@ mindmaps.NavigatorView = function() {
     });
 
     $("#button-navi-zoom-in", $content).button({
-      text : false,
-      icons : {
-        primary : "ui-icon-zoomin"
-      }
+      showLabel : false,
+      icon : "ui-icon-zoomin"
     }).click(function() {
       if (self.buttonZoomInClicked) {
         self.buttonZoomInClicked();
@@ -110,10 +108,8 @@ mindmaps.NavigatorView = function() {
     });
 
     $("#button-navi-zoom-out", $content).button({
-      text : false,
-      icons : {
-        primary : "ui-icon-zoomout"
-      }
+      showLabel : false,
+      icon : "ui-icon-zoomout"
     }).click(function() {
       if (self.buttonZoomOutClicked) {
         self.buttonZoomOutClicked();

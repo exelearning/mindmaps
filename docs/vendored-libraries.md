@@ -79,8 +79,10 @@ header. The panning behaviour is covered by a browser test.
 **This is the editor's appearance**, not a drop-in theme that can be swapped for a
 current one. It is maintained application CSS: `app.css` carries the rules that adapt
 it to jQuery UI 1.14 markup — laying controlgroups out inline where buttonsets used to
-be, and supplying the `.ui-front` stacking rule the theme predates, without which modal
-dialogs sit underneath their own overlay.
+be, dressing the rebuilt button widget (1.12 dropped both `ui-state-default` and the
+`ui-button-text` wrapper the theme styles, so without those rules every button in the
+editor falls back to the browser's own control), and supplying the `.ui-front` stacking
+rule the theme predates, without which modal dialogs sit underneath their own overlay.
 
 Replacing it belongs to a visual redesign with screenshot coverage, not to dependency
 maintenance.

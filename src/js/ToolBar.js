@@ -158,9 +158,7 @@ mindmaps.ToolBarButton.prototype.asJquery = function() {
   var icon = this.command.icon;
   if (icon) {
     $button.button({
-      icons : {
-        primary : icon
-      }
+      icon : icon
     });
   }
 
@@ -191,11 +189,14 @@ mindmaps.ToolBarMenu = function(title, icon) {
 
   this.$menuButton = $("<button/>").button({
     label : title,
-    icons : {
-      primary : icon,
-      secondary : "ui-icon-triangle-1-s"
-    }
+    icon : icon
   }).appendTo(this.$menuWrapper);
+
+  // jQuery UI 1.12 reduced the button widget to a single icon, so the drop-down
+  // arrow that used to be the secondary icon is appended by hand.
+  $("<span/>", {
+    "class" : "ui-icon ui-icon-triangle-1-s menu-arrow"
+  }).appendTo(this.$menuButton);
 
   this.$menu = $("<div/>", {
     "class" : "menu"

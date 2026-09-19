@@ -116,6 +116,15 @@ mindmaps.InspectorView = function() {
    * Initialise
    */
   this.init = function() {
+    // The checkboxes are initialised before the controlgroup picks them up, so
+    // that they keep the label-only look they had under jQuery UI 1.8: the
+    // checkboxradio widget introduced in 1.12 draws a checkbox glyph by default.
+    $allCheckboxes.forEach(function($checkbox) {
+      $checkbox.checkboxradio({
+        icon : false
+      });
+    });
+
     $(".buttonset", $content).controlgroup();
     $branchColorChildrenButton.button();
 
