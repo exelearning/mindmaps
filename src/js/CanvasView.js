@@ -238,9 +238,21 @@ mindmaps.DefaultCanvasView = function() {
     });
 
     // mouse wheel listener
-    this.$getContainer().bind("mousewheel", function(e, delta) {
+    //
+    // deltaY rather than the generic delta: the plugin falls back to the
+    // horizontal delta when the vertical one is zero, so a sideways two-finger
+    // swipe used to zoom the map. Zoom is a vertical gesture, and a horizontal
+    // one should leave it alone.
+    this.$getContainer().bind("mousewheel", function(e, delta, deltaX, deltaY) {
+      // Older builds of the plugin pass no deltaY; fall back to the generic
+      // delta there so this keeps working rather than silently doing nothing.
+      var vertical = typeof deltaY === "number" ? deltaY : delta;
+      if (!vertical) {
+        return;
+      }
+
       if (self.mouseWheeled) {
-        self.mouseWheeled(delta);
+        self.mouseWheeled(vertical);
       }
     });
   };
