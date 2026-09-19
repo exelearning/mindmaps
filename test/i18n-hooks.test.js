@@ -102,7 +102,15 @@ test("representative strings are wrapped in source", function() {
   assert.ok(/_r\(/.test(read("HelpController.js")), "HelpController.js help text");
 });
 
-// 6. The hooks have to survive minification, which is what actually ships.
+// 6. The status bar and the production console alert translate too.
+test("status bar notifications and the console alert are translated", function() {
+  assert.ok(/_\("Mind map saved"\)/.test(read("StatusBar.js")), "StatusBar.js save notice");
+  assert.ok(/_\("Warning"\)/.test(read("StatusBar.js")), "StatusBar.js warning title");
+  assert.ok(/_\("Error"\)/.test(read("StatusBar.js")), "StatusBar.js error title");
+  assert.ok(/window\.alert\(_\("Error"\)/.test(read("MindMaps.js")), "MindMaps.js console alert");
+});
+
+// 7. The hooks have to survive minification, which is what actually ships.
 test("the built bundle keeps the hooks and the fallback", function() {
   if (!fs.existsSync(distBundle)) {
     console.log("  (skipped: run `npm run build` first)");
