@@ -18,7 +18,8 @@
   "scripts": {
     "start": "http-server ./src -p 3000",
     "start:prod": "npm run build && cd bin && python -m SimpleHTTPServer 3000",
-    "build": "jake"
+    "build": "jake",
+    "test": "node test/i18n-hooks.test.js"
   },
   "license": {
     "type": "AGPL",
